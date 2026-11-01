@@ -1,3 +1,4 @@
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from uuid import UUID
 
@@ -69,3 +70,32 @@ def test_get_invoice_returns_the_stored_invoice(session):
 
 def test_get_an_unknown_invoice_returns_none(session):
     assert repository.get_invoice(session, "00000000-0000-0000-0000-000000000000") is None
+
+
+def test_list_invoices_counts_every_invoice(session):
+    for _ in range(4):
+        repository.create_invoice(session, invoice_in())
+
+    page, total = repository.list_invoices(session, offset=0, limit=2)
+
+    assert (len(page), total) == (2, 4)
+
+
+def test_list_invoices_orders_by_creation(session):
+    start = datetime(2026, 10, 1, 9, 0, tzinfo=UTC)
+    for minutes, name in [(2, "Third"), (0, "First"), (1, "Second")]:
+        repository.create_invoice(
+            session, invoice_in(customer_name=name), now=start + timedelta(minutes=minutes)
+        )
+
+    page, _ = repository.list_invoices(session, offset=0, limit=10)
+
+    assert [invoice.customer_name for invoice in page] == ["First", "Second", "Third"]
+
+
+def test_list_invoices_past_the_end_is_empty(session):
+    repository.create_invoice(session, invoice_in())
+
+    page, total = repository.list_invoices(session, offset=5, limit=10)
+
+    assert (page, total) == ([], 1)

@@ -41,6 +41,13 @@ class InvoiceOut(BaseModel):
     gross: Decimal
 
 
+class InvoicePage(BaseModel):
+    items: list[InvoiceOut]
+    offset: int
+    limit: int
+    total: int
+
+
 class ErrorOut(BaseModel):
     code: str
     message: str

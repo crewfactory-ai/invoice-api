@@ -3,6 +3,7 @@
 from datetime import UTC, datetime
 from uuid import uuid4
 
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.db.models import Invoice, InvoiceLine
@@ -36,3 +37,11 @@ def create_invoice(session: Session, data: InvoiceIn, *, now: datetime | None = 
 
 def get_invoice(session: Session, invoice_id: str) -> Invoice | None:
     return session.get(Invoice, invoice_id)
+
+
+def list_invoices(session: Session, *, offset: int, limit: int) -> tuple[list[Invoice], int]:
+    total = session.scalar(select(func.count()).select_from(Invoice)) or 0
+    page = session.scalars(
+        select(Invoice).order_by(Invoice.created_at, Invoice.id).offset(offset).limit(limit)
+    )
+    return list(page), total

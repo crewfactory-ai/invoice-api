@@ -119,3 +119,32 @@ def test_get_an_invoice_with_a_malformed_id_is_400(client):
     response = client.get("/v1/invoices/not-a-uuid")
 
     assert response.status_code == 400
+
+
+def test_the_invoice_list_is_empty_at_first(client):
+    body = client.get("/v1/invoices").json()
+
+    assert body == {"items": [], "offset": 0, "limit": 20, "total": 0}
+
+
+def test_the_invoice_list_pages_with_offset_and_limit(client):
+    ids = {client.post("/v1/invoices", json=invoice_payload()).json()["id"] for _ in range(5)}
+
+    first = client.get("/v1/invoices", params={"limit": 3}).json()
+    second = client.get("/v1/invoices", params={"offset": 3, "limit": 3}).json()
+
+    assert (len(first["items"]), len(second["items"])) == (3, 2)
+    assert {item["id"] for item in first["items"] + second["items"]} == ids
+    assert first["total"] == second["total"] == 5
+
+
+def test_an_invoice_list_limit_above_100_is_400(client):
+    response = client.get("/v1/invoices", params={"limit": 101})
+
+    assert response.status_code == 400
+
+
+def test_a_negative_invoice_list_offset_is_400(client):
+    response = client.get("/v1/invoices", params={"offset": -1})
+
+    assert response.status_code == 400
