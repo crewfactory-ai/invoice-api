@@ -1,5 +1,6 @@
 """The only module that queries the database (ADR 0002)."""
 
+from collections.abc import Iterator
 from datetime import UTC, datetime
 from uuid import uuid4
 
@@ -46,3 +47,7 @@ def list_invoices(session: Session, *, offset: int, limit: int) -> tuple[list[In
         select(Invoice).order_by(Invoice.created_at, Invoice.id).offset(offset).limit(limit)
     )
     return list(page), total
+
+
+def iter_invoices(session: Session) -> Iterator[Invoice]:
+    yield from session.scalars(select(Invoice).order_by(Invoice.created_at, Invoice.id))

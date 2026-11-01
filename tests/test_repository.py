@@ -106,3 +106,16 @@ def test_list_invoices_past_the_end_is_empty(session):
     page, total = repository.list_invoices(session, offset=5, limit=10)
 
     assert (page, total) == ([], 1)
+
+
+def test_iter_invoices_yields_every_invoice_in_creation_order(session):
+    start = datetime(2026, 10, 1, 9, 0, tzinfo=UTC)
+    for minutes, name in [(1, "Second"), (0, "First")]:
+        repository.create_invoice(
+            session, invoice_in(customer_name=name), now=start + timedelta(minutes=minutes)
+        )
+
+    assert [invoice.customer_name for invoice in repository.iter_invoices(session)] == [
+        "First",
+        "Second",
+    ]
