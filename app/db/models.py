@@ -30,6 +30,7 @@ class Invoice(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     customer_name: Mapped[str]
     cust_ref: Mapped[str | None]
+    currency: Mapped[str] = mapped_column(String(3))
     status: Mapped[str]
     issue_date: Mapped[date]
     due_date: Mapped[date]

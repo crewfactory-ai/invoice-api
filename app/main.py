@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 from app.api import errors, invoices
 
-app = FastAPI(title="invoice-api", version="0.1.0")
+app = FastAPI(title="invoice-api", version="0.2.0")
 errors.install(app)
 app.include_router(invoices.router)
 

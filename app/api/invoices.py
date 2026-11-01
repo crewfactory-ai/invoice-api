@@ -22,6 +22,7 @@ def to_out(invoice: Invoice) -> InvoiceOut:
         id=UUID(invoice.id),
         customer_name=invoice.customer_name,
         cust_ref=invoice.cust_ref,
+        currency=invoice.currency,
         status=invoice.status,
         issue_date=invoice.issue_date,
         due_date=invoice.due_date,

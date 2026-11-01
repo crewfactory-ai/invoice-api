@@ -22,6 +22,24 @@ def test_create_invoice_keeps_the_given_status(client):
     assert body["status"] == "issued"
 
 
+def test_create_invoice_defaults_currency_to_eur(client):
+    body = client.post("/v1/invoices", json=invoice_payload()).json()
+
+    assert body["currency"] == "EUR"
+
+
+def test_create_invoice_keeps_the_given_currency(client):
+    body = client.post("/v1/invoices", json=invoice_payload(currency="SEK")).json()
+
+    assert body["currency"] == "SEK"
+
+
+def test_create_invoice_with_a_four_letter_currency_is_400(client):
+    response = client.post("/v1/invoices", json=invoice_payload(currency="EURO"))
+
+    assert response.status_code == 400
+
+
 def test_cust_ref_is_optional(client):
     payload = invoice_payload()
     del payload["cust_ref"]

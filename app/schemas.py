@@ -18,6 +18,7 @@ class InvoiceLineIn(BaseModel):
 class InvoiceIn(BaseModel):
     customer_name: str = Field(min_length=1, max_length=200)
     cust_ref: str | None = Field(default=None, max_length=64)
+    currency: str = Field(default="EUR", min_length=3, max_length=3)
     status: InvoiceStatus = "draft"
     issue_date: date
     due_date: date
@@ -32,6 +33,7 @@ class InvoiceOut(BaseModel):
     id: UUID
     customer_name: str
     cust_ref: str | None
+    currency: str
     status: InvoiceStatus
     issue_date: date
     due_date: date

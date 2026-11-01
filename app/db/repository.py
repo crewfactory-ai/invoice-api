@@ -15,6 +15,7 @@ def create_invoice(session: Session, data: InvoiceIn, *, now: datetime | None = 
         id=str(uuid4()),
         customer_name=data.customer_name,
         cust_ref=data.cust_ref,
+        currency=data.currency,
         status=data.status,
         issue_date=data.issue_date,
         due_date=data.due_date,

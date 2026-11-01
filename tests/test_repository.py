@@ -51,6 +51,13 @@ def test_create_invoice_stores_the_status(session):
     assert repository.get_invoice(session, invoice.id).status == "paid"
 
 
+def test_create_invoice_stores_the_currency(session):
+    invoice = repository.create_invoice(session, invoice_in(currency="NOK"))
+    session.expunge_all()
+
+    assert repository.get_invoice(session, invoice.id).currency == "NOK"
+
+
 def test_a_missing_cust_ref_is_stored_as_null(session):
     invoice = repository.create_invoice(session, invoice_in(cust_ref=None))
     session.expunge_all()
