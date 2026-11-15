@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from app.domain.tax import invoice_totals, line_net
+from app.domain.tax import invoice_totals, line_net, line_vat
 
 
 @dataclass
@@ -38,6 +38,21 @@ def test_vat_is_rounded_to_cents():
     totals = invoice_totals([line("3", "19.99", "0.21")])
 
     assert totals.vat == Decimal("12.59")
+
+
+def test_line_vat_rounds_half_even_to_cents():
+    assert line_vat(line("1", "10.50", "0.21")) == Decimal("2.20")
+    assert line_vat(line("1", "10.50", "0.09")) == Decimal("0.94")
+
+
+def test_vat_is_the_sum_of_the_rounded_line_amounts():
+    totals = invoice_totals([line("1", "10.50", "0.21"), line("1", "10.50", "0.21")])
+
+    assert (totals.net, totals.vat, totals.gross) == (
+        Decimal("21.00"),
+        Decimal("4.40"),
+        Decimal("25.40"),
+    )
 
 
 def test_a_zero_rate_line_has_no_vat():
